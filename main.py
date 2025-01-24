@@ -14,12 +14,12 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #convert image to gray
 axs[0, 1].imshow(cv2.cvtColor(gray, cv2.COLOR_BGR2RGB)) #show processed image
 axs[0, 1].set_title('Grey Image')
 
-# Apply Gaussian Blur
-blurred = cv2.GaussianBlur(gray, (9, 9), 0) #Apply Gaussian blur, 5x5 kernel, sigma=0, to the gray image
+# Apply Gaussian Blur, 9x9 kernel, sigma=0
+blurred = cv2.GaussianBlur(gray, (9, 9), 0)
 axs[0, 2].imshow(cv2.cvtColor(blurred, cv2.COLOR_BGR2RGB))
 axs[0, 2].set_title('Blurred Image')
 
-# Apply Adaptive Thresholding
+# Apply Adaptive Thresholding with Gaussian Weighted Mean, block size=25, C=2
 thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 2) 
 edged = cv2.Canny(thresh, 50, 250) #Edge detection
 
@@ -73,7 +73,8 @@ if location is not None:
     axs[1, 2].imshow(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2RGB)) #show the cropped image
     axs[1, 2].set_title('Cropped Image')
 
-    # Sort the coordinates to ensure they are in the order: top-left, top-right, bottom-right, bottom-left
+    # Sort the coordinates to ensure they are in the order: 
+    # top-left, top-right, bottom-right, bottom-left
     location = location.reshape(4, 2)
     rect = np.zeros((4, 2), dtype="float32")
 
@@ -95,7 +96,8 @@ if location is not None:
     heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
     maxHeight = max(int(heightA), int(heightB))
 
-    # Calculate the destination points to which the top-left, top-right, bottom-right, and bottom-left points will be mapped
+    # Calculate the destination points to which the 
+    # top-left, top-right, bottom-right, and bottom-left points will be mapped
     dst = np.array([
         [0, 0],
         [maxWidth - 1, 0],
@@ -115,7 +117,14 @@ if location is not None:
     if result:
         text = result[0][-2] #Extract the text from the result
         font = cv2.FONT_HERSHEY_SIMPLEX
-        res = cv2.putText(img, text=text, org=(int(rect[0][0]), int(rect[1][1])+60), fontFace=font, fontScale=1.2, color=(0,255,0), thickness=2, lineType=cv2.LINE_AA) #put the text on the image
+        res = cv2.putText(img, text=text, 
+                          org=(int(rect[0][0]), 
+                               int(rect[1][1])+60), 
+                               fontFace=font, 
+                               fontScale=1.2, 
+                               color=(0,255,0), 
+                               thickness=2, 
+                               lineType=cv2.LINE_AA) #put the text on the image
         res = cv2.rectangle(img, tuple(approx[0][0]), tuple(approx[2][0]), (0,255,0),3) #Draw a rectangle around the text
 
         axs[2, 1].imshow(cv2.cvtColor(res, cv2.COLOR_BGR2RGB)) #show the final image with text
